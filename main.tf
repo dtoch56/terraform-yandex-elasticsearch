@@ -1,43 +1,55 @@
 locals {
   security_group_ids = var.default_security_groups == true ? setunion([
-          yandex_vpc_security_group.public-services[0].id
-      ], var.security_group_ids) : var.security_group_ids
+    yandex_vpc_security_group.public-services[0].id
+  ], var.security_group_ids) : var.security_group_ids
 }
 
 resource "yandex_mdb_elasticsearch_cluster" "elastic" {
-  name        = var.name
-  description = var.description
-  environment = var.environment
-  network_id  = var.network_id
-  folder_id   = var.folder_id
-  security_group_ids = local.security_group_ids
-  service_account_id  = yandex_iam_service_account.es.id
-  deletion_protection = false
+  name                = var.name
+  description         = var.description
+  environment         = var.environment
+  network_id          = var.network_id
+  folder_id           = var.folder_id
+  security_group_ids  = local.security_group_ids
+  service_account_id  = local.service_account_id
+  deletion_protection = var.deletion_protection
+  labels              = var.labels
 
   config {
-    version = var.elastic_version
-    edition = var.elastic_edition
-#    plugins        =
+    version        = var.elastic_version
+    edition        = var.elastic_edition
+    plugins        = var.plugins
     admin_password = var.admin_password
 
     data_node {
       resources {
-        resource_preset_id = "s2.micro"
-        disk_type_id       = "network-ssd"
-        disk_size          = 20
+        resource_preset_id = var.data_node_resource_preset_id
+        disk_type_id       = var.data_node_disk_type_id
+        disk_size          = var.data_node_disk_size
       }
     }
 
-#    master_node {
-#    }
+    master_node {
+      resources {
+        resource_preset_id = var.data_node_resource_preset_id
+        disk_type_id       = var.data_node_disk_type_id
+        disk_size          = var.data_node_disk_size
+      }
+    }
   }
 
   host {
-    name             = "develz-elastic-node"
-    zone             = var.zone
-    type             = "DATA_NODE"
-    assign_public_ip = false
-    subnet_id        = var.subnet_id
+    name             = var.host_name
+    zone             = var.host_zone
+    type             = var.host_type
+    subnet_id        = var.host_subnet_id
+    assign_public_ip = var.host_assign_public_ip
+  }
+
+  maintenance_window {
+    type = var.maintenance_type
+    day  = var.maintenance_day
+    hour = var.maintenance_hour
   }
 }
 

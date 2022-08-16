@@ -5,10 +5,10 @@ resource "yandex_vpc_security_group" "public-services" {
   description = "Входящий трафик из группы безопасности, в которой находится ВМ, на порты 443 (Kibana) и 9200 (Elasticsearch)."
   network_id  = var.network_id
 
-# протокол: TCP;
-# диапазон портов: 22, 443, 9200;
-# тип источника: CIDR;
-# источник: 0.0.0.0/0.
+  # протокол: TCP;
+  # диапазон портов: 22, 443, 9200;
+  # тип источника: CIDR;
+  # источник: 0.0.0.0/0.
   ingress {
     description    = "SSH"
     protocol       = "TCP"
@@ -27,10 +27,10 @@ resource "yandex_vpc_security_group" "public-services" {
     port           = 9200
     v4_cidr_blocks = ["0.0.0.0/0"]
   }
-# протокол: Any;
-# диапазон портов: 0-65535;
-# тип назначения: CIDR;
-# назначение: 0.0.0.0/0.
+  # протокол: Any;
+  # диапазон портов: 0-65535;
+  # тип назначения: CIDR;
+  # назначение: 0.0.0.0/0.
   egress {
     protocol       = "Any"
     from_port      = 0
