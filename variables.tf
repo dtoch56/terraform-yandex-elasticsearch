@@ -131,7 +131,8 @@ variable "host_assign_public_ip" {
   Sets whether the host should get a public IP address on creation.
   Can be either true or false.
   EOF
-  type        = string
+  type        = bool
+  default     = false
 }
 
 
