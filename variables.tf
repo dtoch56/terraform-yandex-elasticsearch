@@ -276,24 +276,8 @@ variable "bastion_labels" {
   }
 }
 
-
-
-
-
 variable "elastic_resources_prefix" {
   description = "Prefix for names of resources"
   type        = string
-  default     = "elastic"
+  default     = "elastic-"
 }
-
-
-
-
-
-
-variable "local_subnet_ranges" {
-  description = ""
-  type        = list(string)
-  default     = []
-}
-
