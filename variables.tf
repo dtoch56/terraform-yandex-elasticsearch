@@ -92,7 +92,7 @@ variable "default_security_groups" {
 variable "security_group_ids" {
   description = "A set of ids of security groups assigned to hosts of the cluster."
   type        = set(string)
-  default     = null
+  default     = []
 }
 
 variable "vpn_ips" {

@@ -3,6 +3,7 @@ resource "yandex_vpc_security_group" "public-services" {
 
   name        = "${var.elastic_resources_prefix}public-services"
   description = "Входящий трафик из группы безопасности, в которой находится ВМ, на порты 443 (Kibana) и 9200 (Elasticsearch)."
+  folder_id   = var.folder_id
   network_id  = var.network_id
 
   # протокол: TCP;

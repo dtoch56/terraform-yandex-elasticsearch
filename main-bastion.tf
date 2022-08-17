@@ -1,6 +1,8 @@
 resource "yandex_compute_instance" "elastic-bastion" {
   count = var.create_elastic_bastion == true ? 1 : 0
 
+  folder_id   = var.folder_id
+  zone        = var.host_zone
   name        = var.bastion_name
   hostname    = var.bastion_hostname
   description = var.bastion_description
