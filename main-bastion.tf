@@ -20,6 +20,13 @@ resource "yandex_vpc_security_group" "elastic-bastion" {
     port           = 22
     v4_cidr_blocks = var.vpn_ips
   }
+  egress {
+    protocol       = "ANY"
+    description    = "For outgoing traffic that allows Elasticsearch bastion to connect to external resources"
+    v4_cidr_blocks = ["0.0.0.0/0"]
+    from_port      = 0
+    to_port        = 65535
+  }
 }
 
 resource "yandex_compute_instance" "elastic-bastion" {
@@ -49,11 +56,11 @@ resource "yandex_compute_instance" "elastic-bastion" {
   }
 
   network_interface {
-    subnet_id  = var.host_subnet_id
-    ip_address = var.bastion_internal_ip
-    ipv6       = false
-    nat        = true
-    security_group_ids = yandex_vpc_security_group.elastic-bastion
+    subnet_id          = var.host_subnet_id
+    ip_address         = var.bastion_internal_ip
+    ipv6               = false
+    nat                = true
+    security_group_ids = local.bastion_security_group_ids
   }
 
   metadata = {
@@ -65,7 +72,7 @@ resource "yandex_compute_instance" "elastic-bastion" {
     inline = ["hostname"]
     connection {
       type        = "ssh"
-      host        = "${self.network_interface[0].nat_ip_address}"
+      host        = self.network_interface[0].nat_ip_address
       user        = "ansbl"
       private_key = file(var.bastion_ssh_key_private_file)
     }
@@ -77,11 +84,11 @@ ansible-playbook \
 -u ansbl \
 -i '${self.network_interface[0].nat_ip_address}' \
 --private-key ${var.bastion_ssh_key_private_file} \
--e "ansible_become_pass=Vfhujif90" \
+-e "ansible_become_pass=${var.ansible_become_pass}" \
 -e "es_api_host=${local.elasticsearch_hosts[0]}" \
 -e "es_api_basic_auth_password=${yandex_mdb_elasticsearch_cluster.elastic.config[0].admin_password}" \
--e "jaeger_admin_password=LwXBEFLJ6E4D8avgJrYJWXQd" \
--e "fluentd_admin_password=PeGYzfn3W9an5SL8veBbBuGY" \
+-e "jaeger_admin_password=${var.jaeger_admin_password}" \
+-e "fluentd_admin_password=${var.fluentd_admin_password}" \
 ${path.module}/ansible/main.yml
 EOT
   }

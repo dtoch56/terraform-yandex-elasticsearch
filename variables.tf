@@ -278,18 +278,18 @@ variable "bastion_labels" {
 
 variable "bastion_ansible_user" {
   description = "Ansible user to"
-  default = "ansbl"
+  default     = "ansbl"
 }
 
 variable "bastion_cloud_init_user_data_file" {
   description = "Cloud-init user-data file path"
-  type = string
-  default = "./cloud-init/user-data.yml"
+  type        = string
+  default     = "./cloud-init/user-data.yml"
 }
 
 variable "bastion_ssh_key_private_file" {
   description = "Private SSH key file path for elasticsearch bastion"
-  type = string
+  type        = string
 }
 
 variable "bastion_default_security_groups" {
@@ -304,6 +304,20 @@ variable "bastion_security_group_ids" {
   default     = []
 }
 
+variable "ansible_become_pass" {
+  description = "Bastion's ansible user password"
+  type = string
+}
+
+variable "jaeger_admin_password" {
+  description = "Jaeger admin password"
+  type = string
+}
+
+variable "fluentd_admin_password" {
+  description = "Fluentd admin password"
+  type = string
+}
 
 variable "elastic_resources_prefix" {
   description = "Prefix for names of resources"
