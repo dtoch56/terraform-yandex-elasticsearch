@@ -1,0 +1,9 @@
+---
+- name: Prepare Elasticsearch cluster
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: Elasticsearch role
+    ansible.builtin.include_role:
+      name: klusters.ansible.users_and_roles

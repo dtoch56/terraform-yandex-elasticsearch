@@ -1,0 +1,11 @@
+#cloud-config
+users:
+  - name: ansbl
+    uid: "1099"
+    gecos: Ansible user
+#    hashed_passwd:
+    sudo: ALL=(ALL) ALL
+    shell: /bin/bash
+    homedir: /home/ansbl
+    lock_passwd: false
+    ssh_authorized_keys: []
