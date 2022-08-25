@@ -307,16 +307,19 @@ variable "bastion_security_group_ids" {
 variable "ansible_become_pass" {
   description = "Bastion's ansible user password"
   type        = string
+  default     = ""
 }
 
 variable "jaeger_admin_password" {
   description = "Jaeger admin password"
   type        = string
+  default     = ""
 }
 
 variable "fluentd_admin_password" {
   description = "Fluentd admin password"
   type        = string
+  default     = ""
 }
 
 variable "elastic_resources_prefix" {
