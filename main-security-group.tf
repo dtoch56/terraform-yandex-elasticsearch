@@ -14,7 +14,7 @@ resource "yandex_vpc_security_group" "public-services" {
     description    = "SSH"
     protocol       = "TCP"
     port           = 22
-    v4_cidr_blocks = var.vpn_ips
+    v4_cidr_blocks = length(var.vpn_ips) == 0 ? ["0.0.0.0/0"] : var.vpn_ips
   }
   ingress {
     description    = "Kibana"
