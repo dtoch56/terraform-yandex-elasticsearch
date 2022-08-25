@@ -1,7 +1,7 @@
 locals {
   elasticsearch_hosts = [for h in yandex_mdb_elasticsearch_cluster.elastic.host : h.fqdn]
 
-  bastion_security_group_ids = var.bastion_default_security_groups == true ? setunion([
+  bastion_security_group_ids = var.bastion_default_security_groups == true && length(yandex_vpc_security_group.elastic-bastion) > 0 ? setunion([
     yandex_vpc_security_group.elastic-bastion[0].id
   ], var.bastion_security_group_ids) : var.bastion_security_group_ids
 }
