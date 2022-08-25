@@ -8,7 +8,7 @@ To create an Elasticsearch cluster named `my-es` in Yandex.Cloud folder with id 
 
 ```hcl
 module "elasticsearch" {
-  source  = "dtoch56/elasticsearch/yandex"
+  source  = "dtoch56/ansible/yandex"
 
   cloud_id    = "xxx000xxx000xxx000xx"
   folder_name = "my-folder"

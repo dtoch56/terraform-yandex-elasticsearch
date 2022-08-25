@@ -31,9 +31,9 @@ resource "yandex_mdb_elasticsearch_cluster" "elastic" {
 
     master_node {
       resources {
-        resource_preset_id = var.data_node_resource_preset_id
-        disk_type_id       = var.data_node_disk_type_id
-        disk_size          = var.data_node_disk_size
+        resource_preset_id = var.master_node_resource_preset_id
+        disk_type_id       = var.master_node_disk_type_id
+        disk_size          = var.master_node_disk_size
       }
     }
   }

@@ -9,3 +9,8 @@ output "service_account_id" {
   EOF
   value       = local.service_account_id
 }
+
+output "hosts" {
+  description = "Elasticsearch hosts"
+  value = [for h in yandex_mdb_elasticsearch_cluster.elastic.host : h.fqdn]
+}

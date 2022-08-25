@@ -1,5 +1,29 @@
+locals {
+  elasticsearch_hosts = [for h in yandex_mdb_elasticsearch_cluster.elastic.host : h.fqdn]
+
+  bastion_security_group_ids = var.bastion_default_security_groups == true ? setunion([
+    yandex_vpc_security_group.elastic-bastion[0].id
+  ], var.bastion_security_group_ids) : var.bastion_security_group_ids
+}
+
+resource "yandex_vpc_security_group" "elastic-bastion" {
+  count = var.create_elastic_bastion ? 1 : 0
+
+  name        = "${var.bastion_name}-default"
+  description = "Default security group for Elasticsearch bastion"
+  folder_id   = var.folder_id
+  network_id  = var.network_id
+
+  ingress {
+    description    = "SSH"
+    protocol       = "TCP"
+    port           = 22
+    v4_cidr_blocks = var.vpn_ips
+  }
+}
+
 resource "yandex_compute_instance" "elastic-bastion" {
-  count = var.create_elastic_bastion == true ? 1 : 0
+  count = var.create_elastic_bastion ? 1 : 0
 
   folder_id   = var.folder_id
   zone        = var.host_zone
@@ -29,10 +53,47 @@ resource "yandex_compute_instance" "elastic-bastion" {
     ip_address = var.bastion_internal_ip
     ipv6       = false
     nat        = true
+    security_group_ids = yandex_vpc_security_group.elastic-bastion
   }
 
   metadata = {
     group     = "devops"
-    user-data = file("./files/user-data.yml")
+    user-data = file(var.bastion_cloud_init_user_data_file)
+  }
+
+  provisioner "remote-exec" {
+    inline = ["hostname"]
+    connection {
+      type        = "ssh"
+      host        = "${self.network_interface[0].nat_ip_address}"
+      user        = "ansbl"
+      private_key = file(var.bastion_ssh_key_private_file)
+    }
+  }
+
+  provisioner "local-exec" {
+    command = <<-EOT
+ansible-playbook \
+-u ansbl \
+-i '${self.network_interface[0].nat_ip_address}' \
+--private-key ${var.bastion_ssh_key_private_file} \
+-e "ansible_become_pass=Vfhujif90" \
+-e "es_api_host=${local.elasticsearch_hosts[0]}" \
+-e "es_api_basic_auth_password=${yandex_mdb_elasticsearch_cluster.elastic.config[0].admin_password}" \
+-e "jaeger_admin_password=LwXBEFLJ6E4D8avgJrYJWXQd" \
+-e "fluentd_admin_password=PeGYzfn3W9an5SL8veBbBuGY" \
+${path.module}/ansible/main.yml
+EOT
   }
 }
+
+output "bastion_public_ip" {
+  description = "Elasticsearch bastion public IP address"
+  value       = var.create_elastic_bastion ? yandex_compute_instance.elastic-bastion[0].network_interface[0].nat_ip_address : null
+}
+
+output "bastion_fqdn" {
+  description = "Elasticsearch bastion FQDN"
+  value       = var.create_elastic_bastion ? yandex_compute_instance.elastic-bastion[0].fqdn : null
+}
+

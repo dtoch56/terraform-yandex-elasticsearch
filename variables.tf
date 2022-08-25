@@ -131,7 +131,7 @@ variable "host_assign_public_ip" {
   Sets whether the host should get a public IP address on creation.
   Can be either true or false.
   EOF
-  type        = bool
+  type        = string
   default     = false
 }
 
@@ -276,8 +276,49 @@ variable "bastion_labels" {
   }
 }
 
+variable "bastion_ansible_user" {
+  description = "Ansible user to"
+  default = "ansbl"
+}
+
+variable "bastion_cloud_init_user_data_file" {
+  description = "Cloud-init user-data file path"
+  type = string
+  default = "./cloud-init/user-data.yml"
+}
+
+variable "bastion_ssh_key_private_file" {
+  description = "Private SSH key file path for elasticsearch bastion"
+  type = string
+}
+
+variable "bastion_default_security_groups" {
+  description = "Create default security groups for Elasticsearch bastion"
+  type        = bool
+  default     = true
+}
+
+variable "bastion_security_group_ids" {
+  description = "A set of ids of security groups assigned to Elasticsearch bastion."
+  type        = set(string)
+  default     = []
+}
+
+
 variable "elastic_resources_prefix" {
   description = "Prefix for names of resources"
   type        = string
-  default     = "elastic-"
+  default     = "elastic"
 }
+
+
+
+
+
+
+variable "local_subnet_ranges" {
+  description = ""
+  type        = list(string)
+  default     = []
+}
+
