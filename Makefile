@@ -1,10 +1,20 @@
 SHELL := /bin/bash
 
-## Basic terraform sanity check
-validate:
+help:
+	@echo ''
+	@echo 'Usage: make [TARGET]'
+	@echo 'Targets:'
+	@echo '  fmt       Format all terraform files'
+	@echo '  val       Basic terraform sanity check'
+	@echo '  lint      Lint check Terraform'
+	@echo ''
+
+fmt:
+	terraform fmt -recursive .
+
+val:
 	terraform validate
 
-## Lint check Terraform
 lint:
 ifeq ($(OS), darwin)
 	@FAIL=`terraform fmt -write=false | xargs -n 1 printf '\t- %s\n'`; \
@@ -14,5 +24,3 @@ else
 	[ -z "$$FAIL" ] || (echo "Terraform configuration needs linting. Run 'terraform fmt'"; echo $$FAIL; exit 1)
 endif
 
-fmt:
-	terraform fmt -recursive .
